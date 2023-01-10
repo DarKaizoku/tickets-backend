@@ -1,10 +1,8 @@
-// imports
 const express = require('express');
-require('dotenv').config() // permet de cacher les donnée dans un autrs fichier .env
+require('dotenv').config()
 const { Client } = require('pg');
 const fs = require('fs');
 
-// declarations
 const app = express();
 const port = 8000;
 const client = new Client({
@@ -44,17 +42,16 @@ app.get("/tickets", async (req, res) => {
         const data = await client.query('select * from tickets order by id');
 
         data.rowCount >= 1 ? res.status(200).json({ status: "SUCCESS", data: data.rows }) : res.status(200).json({ status: "NOT FOUND" });
-
+        console.log(tabl_Erreurs[200]);
     }
     catch (err) {
-
+        res.redirect()
         res.status(400).json({ status: "BAD REQUEST" });
-        console.log("!!! ERREUR !!!");
     }
 });
 app.get("/tickets/:id", async (req, res) => {
     try {
-        
+
         const id = req.params.id;
 
         const sql = 'select * from tickets where id = $1';
@@ -63,14 +60,13 @@ app.get("/tickets/:id", async (req, res) => {
 
         data.rowCount === 1 ? res.status(200).json({ status: "SUCCESS", data: data.rows }) : res.status(200).json({ status: "NOT FOUND" });
 
-        //res.status(200).json(data.rows[0]);
 
     }
     catch (err) {
-        res.status(500).json({ status: "!!! ERREUR !!!" });
-        /* res.status(404).json({status:"NOT FOUND"});
-        res.status(400).json({status:"BAD REQUEST"});
-        console.log("!!! ERREUR !!!"); */
+        
+        res.status(404).json({ status: "NOT FOUND" });
+        res.status(400).json({ status: "BAD REQUEST" });
+
     }
 })
 app.post("/tickets", async (req, res) => {
@@ -86,7 +82,6 @@ app.post("/tickets", async (req, res) => {
     } catch (error) {
         res.status(404).json({ status: "BAD REQUEST" });
         res.status(400).json({ status: "BAD REQUEST" });
-        console.log("!!! ERREUR !!!");
     }
 })
 app.put("/tickets/:id", async (req, res) => {
@@ -98,14 +93,13 @@ app.put("/tickets/:id", async (req, res) => {
 
         const sql = 'update tickets set (done,message) = ($3,$2) where id = $1';
 
-        const data = await client.query(sql, [id,message,done]);
+        const data = await client.query(sql, [id, message, done]);
 
-        data.rowCount === 1 ? res.status(200).json({ status: "NO CONTENT", done: "changed" }) : res.status(400).json({ status: "NO CONTENT", done: false ,conseil:"vérifiez votre numéro de ticket"});
+        data.rowCount === 1 ? res.status(200).json({ status: "NO CONTENT", done: "changed" }) : res.status(400).json({ status: "NO CONTENT", done: false, conseil: "vérifiez votre numéro de ticket" });
 
     } catch (error) {
         res.status(404).json({ status: "BAD REQUEST" });
         res.status(405).json({ status: "METHOD NOT ALLOWED" });
-        console.log("!!! ERREUR !!!");
     }
 })
 app.delete("/tickets/:id", async (req, res) => {
@@ -117,12 +111,11 @@ app.delete("/tickets/:id", async (req, res) => {
 
         const data = await client.query(sql, [id]);
 
-        data.rowCount === 1 ? res.status(200).json({ status: "NO CONTENT", deleted: true }) : res.status(400).json({ status: "NO CONTENT", deleted: false ,conseil:"vérifiez votre numéro de ticket"});
+        data.rowCount === 1 ? res.status(200).json({ status: "NO CONTENT", deleted: true }) : res.status(400).json({ status: "NO CONTENT", deleted: false, conseil: "vérifiez votre numéro de ticket" });
 
     } catch (error) {
         res.status(404).json({ status: "BAD REQUEST" });
         res.status(400).json({ status: "BAD REQUEST" });
-        console.log("!!! ERREUR !!!");
     }
 })
 
